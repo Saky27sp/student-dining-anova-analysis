@@ -1,0 +1,621 @@
+---
+title: "Statistics Project"
+author: "Nirja Rajeev - Shradha Bhadoria - Saket Pitale - Sreehari K - Sidharth Sharma"
+format: html
+editor: visual
+---
+
+# MPBA G505 -STATISTICS PROJECT
+
+## STUDENT MEAL CHOICES
+
+### How often they eat out and how much they are willing to pay ?
+
+## Introduction
+
+In a dynamic educational environment like today, there is a crucial need for academic institutions and businesses to understand students' food preferences. Despite the growing trend of students eating outside, no comprehensive data is available to understand the frequency of students eating outside their respective hostel messes and paying extra for the same. Because of this, campus administrators, restaurants, and food service providers cannot establish decisions regarding pricing strategies, optimize food resource utilization, or control food wastage. Therefore, it is crucial to investigate the frequency of students eating outside and how much they are willing to pay to eat outside. We hope the results from this research will enable the development of strategies to enhance the dining experience and implement efficient food wastage control. This study is motivated by several key factors that impact both students and food service operations. Food wastage is one such major challenge seen in campus mess facilities. Inefficient food management leads to environmental harm and financial losses. There is a growing trend of students dining outside hostel mess, it raises concerns about nutritional quality and health. These dining options may not always meet the necessary nutritional standards, leading to health issues. Usually, students struggle with handling finances, leading to overspending on dining out financial management among students.
+
+To get a thorough picture of student dining behaviours, it is critical to analyse characteristics such as age, maturity, preferences, and decision-making. By examining these factors, we can identify the underlying reasons for their dining choices and create strategies that will address specific student needs and preferences. By addressing these aspects, this study aims to enhance the dining experience for students, promote sustainable practices, and improve both financial and health outcomes.
+
+## Variables used in our project
+
+#### Independent Variables:
+
+1.  **Academic Program (UG or PG) - If the student is enrolled in a UG or PG program**
+
+    The major differing factors among these two groups will be:
+
+    -   Budget constraints affect UG students more than PG students.
+    -   Peer influence & peer pressure.
+    -   Age factors affect the general health of the individuals in these two groups.
+
+    Additionally, better awareness is expected from PG students.
+
+2.  **Food Preference (Veg or Non-Veg) - If the food preference of the students is Veg or Non-Veg**
+
+    -   The mess predominantly serves vegetarian foods more often than non-vegetarian food. This might affect the choice of students who want to eat more non-veg in their meals for various reasons, such as a rich-protein diet, muscle building, and a high-nutrient content diet.
+    -   We aim to discover how this dietary preference affects the frequency of students' eating/spending on food outside mess. 
+
+3.  **Health-Conscious Habits - If the student consciously follows healthy habits like controlled calorie intake, a balanced diet, playing sports, or hitting the gym**
+
+    -   We aim to discover if the above habits prevent students from eating food outside their mess.
+
+    -   Is the mess food enough to fulfill the dietary requirements of the people aiming for better health and physique?
+
+#### Control Variable: Quality of Mess food
+
+We assume the hostel mess food quality will be constant for all days. The quality of mess food won’t affect students choosing outside food over mess food.
+
+#### Dependent Variables:
+
+1.  **Frequency of Eating Outside (0-7 days).**
+
+    How many times is the student eating outside the mess? We will ask students how many days a week they eat meals outside the mess. This will only be for complete meals, i.e., lunch or dinner.
+
+2.  **Spending on Meals**.
+
+    How much money are they spending on the meals they are eating outside? We will ask students how much they spend on average per meal
+
+## Data Collection
+
+We have collected and stored data via Google Forms along with offline, in-person surveys. We have targeted a sample size of about 240 students. The responses will thereby provide us with sufficient dataset to conclude meaningful conclusions.
+
+![](images/form.png){fig-align="center"}
+
+We hope to drill and find valuable insights into the dining and financial preferences of students. Also, it will provide us with the data that could help us to bring certain reforms in our existing mess system.
+
+## Data classification
+
+The collected data is cleaned and classified according to the following criteria:
+
+1.  **UG - Vegetarian - Healthy habits**
+
+2.  **PG - Vegetarian - Healthy habits**
+
+3.  **UG - Vegetarian - No Healthy habits**
+
+4.  **PG - Vegetarian - No Healthy habits**
+
+5.  **UG - Non-Vegetarian - Healthy habits**
+
+6.  **PG - Non-Vegetarian - Healthy habits**
+
+7.  **UG - Non-Vegetarian - No Healthy habits**
+
+8.  **PG - Non-Vegetarian - No Healthy habits**
+
+### ---------------------------------------------------------------
+
+## Required Libraries
+
+```{r}
+#install packages
+#install.packages(c("tidyverse", "readxl", "writexl", "ggplot2","knitr"))
+
+library(tidyverse)
+library(readxl)
+library(writexl)
+library(ggplot2)
+library(knitr)
+```
+
+## Load the data
+
+```{r}
+responses = read_excel("Data/responses.xlsx")
+```
+
+## Renaming columns
+
+```{r}
+responses_renamed = responses |> 
+  rename(`UG/PG`=`Are you currently enrolled in an UG program, or are you pursuing a HD/PhD program?`) |> 
+  rename(`Veg/Non-veg` = `Are you a Vegetarian or a Non-vegetarian?`) |> 
+  rename(`BITS_ID` = `BITS ID`) |> 
+  rename(`outside_meals_frequency` = `How many days in a week, do you eat food outside your Hostel mess?\r\n(Enter a number between 0 and 7)`) |> 
+  rename(`meal_expenditure_avg` = `On average, how much do you spend per meal when dining out? (Enter the amount in ₹)`) |> 
+  rename(`email` = `Email Address`) |> 
+  rename(`name` = `Name of Student`) |> 
+  rename(`following_health_habits` = `Are there any particular habits or routines you follow to maintain your health?`)
+
+required_variables = responses_renamed |> 
+  select('UG/PG','Veg/Non-veg','following_health_habits','outside_meals_frequency', 'meal_expenditure_avg')
+
+required_variables
+
+```
+
+## Data Analysis
+
+### Spending habits of VEG vs NON-VEG
+
+```{r}
+#plotting boxplot for spending habits of VEG vs NON-VEG
+ggplot(required_variables, aes(x = `Veg/Non-veg`, y = meal_expenditure_avg, fill='blue')) +
+  geom_boxplot(aes(fill = `Veg/Non-veg`)) +
+  labs(
+    title = "Spending Habits: Veg vs Non-Veg",
+    x = "Meal Type (Veg/Non-Veg)",
+    y = "Average Amount Spent (Rs)"
+  )+
+  scale_fill_manual(
+    values = c("Vegetarian" = "lightgreen", "Non-vegetarian" = "pink")  # Assign custom colors to categories
+  ) +
+  theme(
+    panel.background = element_rect(fill = "lightblue"),
+    panel.grid = element_blank()
+  )
+```
+
+### Spending habits by Educational degree
+
+```{r}
+#Plotting boxplot for spending habits by Educational degree i.e. UG/PG
+ggplot(required_variables, aes(x = `UG/PG`, y = meal_expenditure_avg, fill='blue')) +
+  geom_boxplot(aes(fill = `UG/PG`)) +
+  labs(
+    title = "Spending Habits: UG vs PG",
+    x = "Degree Type",
+    y = "Average Amount Spent (Rs)"
+  )+
+  scale_fill_manual(
+    values = c("UG" = "blue", "HD/PhD" = "yellow")  # Assign custom colors to categories
+  ) +
+  theme(
+    panel.background = element_rect(fill = "lightblue"),
+    panel.grid = element_blank()
+  )
+```
+
+### Frequency of Eating out: Students following health routines or not
+
+```{r}
+#Plotting boxplot for number of times eating outside for students who follow healthy habits or not
+ggplot(required_variables, aes(x = `following_health_habits`, y = outside_meals_frequency)) +
+  geom_boxplot(aes(fill = `following_health_habits`)) +
+  labs(
+    title = "Frequency of Eating out: Students following health routines or not",
+    x = "Follow Health routine",
+    y = "Frequency"
+  )+
+  theme(
+    panel.background = element_rect(fill = "lightblue"),
+    panel.grid = element_blank()
+  )
+```
+
+### Frequency of Eating out
+
+```{r}
+#plotting barchart for frequency
+ggplot(required_variables,aes(x=outside_meals_frequency))+
+  geom_bar(aes(fill="red"))+
+  labs(
+    title = "Frequency of Eating out",
+    x = "No of Days in a week",
+    y = "Count of students"
+  )+
+  theme(
+    panel.background = element_rect(fill = "pink"),
+    panel.grid = element_blank()
+  )
+```
+
+### Average Meal Expenditure of students
+
+```{r}
+#Average Meal Expenditure of students
+ggplot(required_variables,aes(x=meal_expenditure_avg))+
+  geom_density(fill="blue")+
+  theme(
+    axis.text.y = element_blank(),  # Remove y-axis text
+    axis.ticks = element_blank() ,   # Remove axis ticks
+    panel.background = element_rect(fill = "pink"),
+    panel.grid = element_blank()
+  )+
+  labs(
+    title = "Average Meal Expenditure of students",
+    x = "Avg Meal price in Rs",
+    y=" "
+  )
+```
+
+## Data Cleaning
+
+### 1 - Splitting collected data into each category
+
+Based on the 3 dependent variables available there are 8 scenarios available. Below are the data collected for each scenario
+
+Randomly taking a sample of **first 30 data points** and removing rest
+
+### Scenario 1 - (UG/Vegetarian/Has-health-habits)
+
+```{R}
+scenario_1 = required_variables |> 
+  filter(`UG/PG` == "UG" & `Veg/Non-veg` == "Vegetarian" & following_health_habits == "Yes, I do") |> 
+  head(30)
+
+scenario_1
+```
+
+### Scenario 2 - (UG/Vegetarian/No-health-habits)
+
+```{R}
+scenario_2 = required_variables |> 
+  filter(`UG/PG` == "UG" & `Veg/Non-veg` == "Vegetarian" & following_health_habits == "No, I don't") |> 
+  head(30)
+
+scenario_2
+```
+
+### Scenario 3 - (UG/Non-vegetarian/Has-health-habits)
+
+```{R}
+scenario_3 = required_variables |> 
+  filter(`UG/PG` == "UG" & `Veg/Non-veg` == "Non-vegetarian" & following_health_habits == "Yes, I do") |> 
+  head(30)
+
+scenario_3
+```
+
+### Scenario 4 - (UG/Non-vegetarian/No-health-habits)
+
+```{R}
+scenario_4 = required_variables |> 
+  filter(`UG/PG` == "UG" & `Veg/Non-veg` == "Non-vegetarian" & following_health_habits == "No, I don't") |> 
+  head(30)
+
+scenario_4
+```
+
+### Scenario 5 - (HD-PHD/Vegetarian/Has-health-habits)
+
+```{R}
+scenario_5 = required_variables |> 
+  filter(`UG/PG` == "HD/PhD" & `Veg/Non-veg` == "Vegetarian" & following_health_habits == "Yes, I do") |> 
+  head(30)
+
+scenario_5
+```
+
+### Scenario 6 - (HD-PHD/Vegetarian/No-health-habits)
+
+```{R}
+scenario_6 = required_variables |> 
+  filter(`UG/PG` == "HD/PhD" & `Veg/Non-veg` == "Vegetarian" & following_health_habits == "No, I don't") |> 
+  head(30)
+
+scenario_6
+```
+
+### Scenario 7 - (HD-PHD/Non-vegetarian/Has-health-habits)
+
+```{R}
+scenario_7 = required_variables |> 
+  filter(`UG/PG` == "HD/PhD" & `Veg/Non-veg` == "Non-vegetarian" & following_health_habits == "Yes, I do") |> 
+  head(30)
+
+scenario_7
+```
+
+### Scenario 8 - (HD-PHD/Non-vegetarian/No-health-habits)
+
+```{R}
+scenario_8 = required_variables |> 
+  filter(`UG/PG` == "HD/PhD" & `Veg/Non-veg` == "Non-vegetarian" & following_health_habits == "No, I don't") |>
+  head(30)
+
+scenario_8
+```
+
+### Combining Data
+
+```{r}
+cleaned_responses = rbind(scenario_1,scenario_2,scenario_3,scenario_4,scenario_5,scenario_6,scenario_7,scenario_8)
+
+cleaned_responses
+```
+
+## ANOVA
+
+### 1) Dependent variable - Outside Meal Frequency
+
+```{r}
+anova_model_dv1 <- aov(outside_meals_frequency ~ `UG/PG` * `Veg/Non-veg` * following_health_habits, 
+                      data = cleaned_responses)
+```
+
+#### Results
+
+```{r, fig.width=15, fig.height=5}
+anova_summary <- summary(anova_model_dv1)
+anova_summary_df <- as.data.frame(anova_summary[[1]])
+knitr::kable(anova_summary_df, format = "html", table.attr = "style='width:100%;'")
+```
+
+### Significant Variables by using p-value approach.
+
+##### Considering 95% Confidence Level
+
+```{r}
+anova_summary_dv1 <- summary(anova_model_dv1)
+anova_table_dv1 <- as.data.frame(anova_summary_dv1[[1]])
+anova_table_dv1$Term <- rownames(anova_table_dv1)
+significant_terms_dv1 <- anova_table_dv1 |> 
+  filter(`Pr(>F)` < 0.05) |> 
+  pull(Term)
+cat("Significant terms (p < 0.05):", paste(significant_terms_dv1, collapse = ", "), "\n")
+```
+
+#### Significant term - following_health_habits
+
+## Anova visualization
+
+### Significance Heatmap
+
+```{r, fig.width=10, fig.height=4}
+anova_table_dv1 <- as.data.frame(anova_summary_dv1[[1]])
+anova_table_dv1$Term <- rownames(anova_table_dv1)
+colnames(anova_table_dv1)[colnames(anova_table_dv1) == "F value"] <- "F"
+
+colnames(anova_table_dv1)[colnames(anova_table_dv1) == "Pr(>F)"] <- "p_value"
+anova_table_dv1$Significance <- ifelse(anova_table_dv1$p_value < 0.05, "Significant", "Not Significant")
+
+ggplot(anova_table_dv1, aes(x = 1, y = Term, fill = Significance)) +
+  geom_tile(color = "white") +
+  scale_fill_manual(values = c("Significant" = "red", "Not Significant" = "blue")) +
+  geom_text(aes(label = Term), size = 3, color = "white", hjust = 0.5, vjust = 0.5) +  # Place text inside tiles
+  labs(title = "Significance of Factors and Interactions (1st DV- Outside Meal Frequency)",
+       x = "",
+       y = "Terms") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),  # Hide x-axis labels
+    axis.text.y = element_blank(),  # Adjust y-axis label size
+    axis.ticks.x = element_blank(),  # Remove x-axis ticks
+    axis.ticks.y = element_blank(),  # Remove y-axis ticks
+    plot.title = element_text(size = 14, hjust = 0.5))
+```
+
+### Strength of Significance -\> F-value
+
+```{r, fig.width=10, fig.height=6}
+ggplot(anova_table_dv1, aes(x = reorder(Term, F), y = F)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "F-Values of Factors and Interactions (1st DV- Outside Meal Frequency)",
+       x = "Factors and Interactions",
+       y = "F-Value") +
+  theme_minimal()
+```
+
+### Interaction effect
+
+#### 1) Veg/Non-veg and UG/PG
+
+```{r, fig.width=10, fig.height=5}
+
+UG_or_PG = cleaned_responses$`UG/PG`
+interaction.plot(cleaned_responses$`Veg/Non-veg`, 
+                 UG_or_PG, 
+                 cleaned_responses$outside_meals_frequency,
+                 col = c("red", "blue"), lty = 1, lwd = 2,
+                 main = "Interaction Plot: Veg/Non-veg and UG/PG",
+                 xlab = "Veg/Non-veg", ylab = "Outside Meals Frequency",
+                 legend = FALSE)
+
+# Add a custom legend
+legend("topright", legend = c("UG", "PG"), 
+       col = c("red", "blue"), lty = 1, lwd = 2, title = "UG/PG")
+```
+
+#### 2) Following health habits and UG/PG
+
+```{r}
+UG_or_PG = cleaned_responses$`UG/PG`
+interaction.plot(cleaned_responses$following_health_habits, 
+                 UG_or_PG, 
+                 cleaned_responses$outside_meals_frequency,
+                 col = c("red", "blue"), lty = 1, lwd = 2,
+                 main = "Interaction Plot: Following health habits and UG/PG",
+                 xlab = "Following health habits", ylab = "Outside Meals Frequency",
+                 legend = FALSE)
+
+# Add a custom legend
+legend("topright", legend = c("UG", "PG"), 
+       col = c("red", "blue"), lty = 1, lwd = 2, title = "UG/PG")
+```
+
+#### 3)Veg/Non-veg and Following health habits
+
+```{r}
+interaction.plot(cleaned_responses$`Veg/Non-veg`, 
+                 cleaned_responses$following_health_habits, 
+                 cleaned_responses$outside_meals_frequency,
+                 col = c("red", "blue"), lty = 1, lwd = 2,
+                 main = "Interaction Plot: Veg/Non-veg and following health habits",
+                 xlab = "Veg/Non-veg", ylab = "Outside Meals Frequency",
+                 legend = FALSE)
+
+# Add a custom legend
+legend("topright", legend = c("Yes", "No"), 
+       col = c("red", "blue"), lty = 1, lwd = 2, title = "Following Health habits")
+```
+
+### 2) Dependent variable - Average Amount spent on the meal
+
+```{r}
+anova_model_dv2 <- aov(meal_expenditure_avg ~ `UG/PG` * `Veg/Non-veg` * following_health_habits, 
+                       data = cleaned_responses)
+```
+
+#### Results
+
+```{r}
+anova_summary1 <- summary(anova_model_dv2)
+anova_summary_df1 <- as.data.frame(anova_summary1[[1]])
+knitr::kable(anova_summary_df1, format = "html", table.attr = "style='width:100%;'")
+```
+
+### Significant Variables by using p-value approach.
+
+##### Considering 95% Confidence Level
+
+```{r}
+anova_summary_dv2 <- summary(anova_model_dv2)
+anova_table_dv2 <- as.data.frame(anova_summary_dv2[[1]])
+anova_table_dv2$Term <- rownames(anova_table_dv2)
+significant_terms_dv2<- anova_table_dv2 |> 
+  filter(`Pr(>F)` < 0.05) |> 
+  mutate(Term = trimws(Term)) |>
+  pull(Term)
+cat("Significant terms (p < 0.05):", paste(significant_terms_dv2, collapse = ", "), "\n")
+```
+
+#### Significant terms - UG/PG , Veg/Non-veg
+
+## Anova Visualization
+
+### Significance Heatmap
+
+```{r, fig.width=10, fig.height=4}
+
+anova_table_dv2 <- as.data.frame(anova_summary_dv2[[1]])
+anova_table_dv2$Term <- rownames(anova_table_dv2)
+colnames(anova_table_dv2)[colnames(anova_table_dv2) == "F value"] <- "F"
+
+colnames(anova_table_dv2)[colnames(anova_table_dv2) == "Pr(>F)"] <- "p_value"
+anova_table_dv2$Significance <- ifelse(anova_table_dv2$p_value < 0.05, "Significant", "Not Significant")
+
+ggplot(anova_table_dv2, aes(x = 1, y = Term, fill = Significance)) +
+  geom_tile(color = "white") +
+  scale_fill_manual(values = c("Significant" = "red", "Not Significant" = "blue")) +
+  geom_text(aes(label = Term), size = 3, color = "white", hjust = 0.5, vjust = 0.5) +  # Place text inside tiles
+  labs(title = "Significance of Factors and Interactions (2nd DV- Average Amount spent on the meal)",
+       x = "",
+       y = "Terms") +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),  # Hide x-axis labels
+    axis.text.y = element_blank(),  # Adjust y-axis label size
+    axis.ticks.x = element_blank(),  # Remove x-axis ticks
+    axis.ticks.y = element_blank(),  # Remove y-axis ticks
+    plot.title = element_text(size = 14, hjust = 0.5))
+```
+
+### Strength of Significance -\> F-value
+
+```{r,  fig.width=10, fig.height=6}
+ggplot(anova_table_dv2, aes(x = reorder(Term, F), y = F)) +
+  geom_bar(stat = "identity", fill = "orange") +
+  coord_flip() +
+  labs(title = "F-Values of Factors and Interactions (2nd DV- Average Amout spent on the meal)",
+       x = "Factors and Interactions",
+       y = "F-Value") +
+  theme_minimal()
+
+```
+
+### Interaction effect - Veg/Non-veg and UG/PG
+
+```{r}
+interaction.plot(cleaned_responses$`Veg/Non-veg`, 
+                 cleaned_responses$`UG/PG`, 
+                 cleaned_responses$meal_expenditure_avg,
+                 col = c("green", "red"), lty = 1, lwd = 2,
+                 main = "Interaction Plot: Veg/Non-veg and UG/PG",
+                 xlab = "Veg/Non-veg", ylab = "Average Amout spent on the meal",
+                 legend = FALSE)
+legend("topright", legend = c("UG", "PG"), 
+       col = c("green", "red"), lty = 1, lwd = 2, title = "UG/PG")
+```
+
+#### 2) Following health habits and UG/PG
+
+```{r}
+UG_or_PG = cleaned_responses$`UG/PG`
+interaction.plot(cleaned_responses$following_health_habits, 
+                 UG_or_PG, 
+                 cleaned_responses$meal_expenditure_avg,
+                 col = c("red", "blue"), lty = 1, lwd = 2,
+                 main = "Interaction Plot: Following health habits and UG/PG",
+                 xlab = "Following health habits", ylab = "Average Amout spent on the meal",
+                 legend = FALSE)
+
+# Add a custom legend
+legend("topright", legend = c("UG", "PG"), 
+       col = c("red", "blue"), lty = 1, lwd = 2, title = "UG/PG")
+```
+
+#### 3)Veg/Non-veg and Following health habits
+
+```{r}
+interaction.plot(cleaned_responses$`Veg/Non-veg`, 
+                 cleaned_responses$following_health_habits, 
+                 cleaned_responses$meal_expenditure_avg,
+                 col = c("red", "blue"), lty = 1, lwd = 2,
+                 main = "Interaction Plot: Veg/Non-veg and following health habits",
+                 xlab = "Veg/Non-veg", ylab = "Average Amout spent on the meal",
+                 legend = FALSE)
+
+# Add a custom legend
+legend("topright", legend = c("Yes", "No"), 
+       col = c("red", "blue"), lty = 1, lwd = 2, title = "Following Health habits")
+```
+
+## Significant terms
+
++---+-----------------------------+---+------------------------------+
+|   | ### Outside Meal Frequency  |   | ### Amount spent on the meal |
++===+=============================+===+==============================+
+| 1 | **Following Health habits** | 1 | **UG/PG**                    |
++---+-----------------------------+---+------------------------------+
+|   |                             | 2 | **Veg/Non-Veg**              |
++---+-----------------------------+---+------------------------------+
+
+## Trend of significant variables.
+
+### Following health habits VS Outside meal frequency
+
+```{r}
+average_outside_meals <- cleaned_responses |> 
+  group_by(following_health_habits) |> 
+  summarise(avg_outside_meals = mean(outside_meals_frequency, na.rm = TRUE))
+print(average_outside_meals)
+```
+
+#### From the above result, we can conclude that people who follow healthy habits tend to eat outside fewer days.
+
+### Probable reason:
+
+Individuals who follow health routines might consciously reduce dining out to control their diet, while those who don't may dine out more often for convenience or indulgence.
+
+### UG/PG VS Avg meal expenditure
+
+```{r}
+average_expenditure1 <- cleaned_responses |> 
+  group_by(`UG/PG`) |> 
+  summarise(average_expenditure = mean(meal_expenditure_avg, na.rm = TRUE))
+print(average_expenditure1)
+```
+
+### Veg/Non-veg vs Avg meal expenditure
+
+```{r}
+average_expenditure2 <- cleaned_responses |> 
+  group_by(`Veg/Non-veg`) |> 
+  summarise(average_expenditure = mean(meal_expenditure_avg, na.rm = TRUE))
+print(average_expenditure2)
+```
+
+#### From the above result, we can conclude that people who are in HD/PhD courses tend to spend more money on meals, and students whose meal preference is non-veg tend to spend more money.
+
+### Probable reason:
+
+HD/PhD students often have greater financial independence due to stipends, savings, or part-time work, allowing them to spend more on dining compared to UG students, who primarily rely on family allowances. Separately, food preferences like non-vegetarian diets generally lead to higher average expenditures due to the higher cost and limited availability of such meals.
+
+# Conclusion
+
+This study highlights how academic level, dietary preferences, and health habits significantly influence students' dining habits and expenditures. HD/PhD students spend more on dining due to financial independence and a preference for quality, while UG students are more cost-conscious. Non-vegetarian diets lead to higher costs, and health-conscious individuals dine out less frequently.
+
+These findings provide valuable insights for food service providers to tailor their offerings to student preferences. Future research could explore additional factors like income or regional influences to deepen understanding of student dining behavior.
